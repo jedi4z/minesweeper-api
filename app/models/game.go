@@ -1,5 +1,7 @@
 package models
 
+import "math/rand"
+
 type Game struct {
 	CommonFields
 	NumberOfCols  int    `json:"number_of_cols" sql:"type:int"`
@@ -24,4 +26,18 @@ func (g *Game) CreateGrid() {
 	}
 
 	g.Grid = rows
+}
+
+func (g *Game) SeedMines() {
+	k := 0
+	for k < g.NumberOfMines {
+		row := rand.Intn(g.NumberOfRows)
+		col := rand.Intn(g.NumberOfCols)
+		cell := g.Grid[row].Cells[col]
+
+		if !cell.HasMine {
+			cell.HasMine = true
+			k++
+		}
+	}
 }

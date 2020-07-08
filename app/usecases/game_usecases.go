@@ -17,6 +17,7 @@ func NewGameUseCases(r repositories.GameRepositoryInterface) GameUseCasesInterfa
 
 func (uc GameUseCases) CreateGame(game *models.Game) error {
 	game.CreateGrid()
+	game.SeedMines()
 
 	return uc.GameRepository.Insert(game)
 }
