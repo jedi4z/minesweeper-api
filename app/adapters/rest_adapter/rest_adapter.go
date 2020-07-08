@@ -2,15 +2,17 @@ package rest_adapter
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jedi4z/minesweeper-api/app/container"
 	"net/http"
 )
 
 type RestAdapter struct {
+	container container.Container
 }
 
-func NewRestEngine() *gin.Engine {
+func NewRestEngine(c container.Container) *gin.Engine {
 	r := gin.Default()
-	s := &RestAdapter{}
+	s := &RestAdapter{container: c}
 
 	v1 := r.Group("/v1")
 	{
