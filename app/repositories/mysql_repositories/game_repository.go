@@ -34,7 +34,10 @@ func (r GameRepository) FindAll() ([]models.Game, error) {
 func (r GameRepository) Find(id uint) (*models.Game, error) {
 	game := new(models.Game)
 
-	if err := r.DB.Find(game, id).Error; err != nil {
+	if err := r.DB.
+		Preload("Grid").
+		Preload("Grid.Cells").
+		Find(game, id).Error; err != nil {
 		return nil, err
 	}
 
