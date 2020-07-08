@@ -1,4 +1,7 @@
 
+wire:
+	wire ./app/container
+
 run:
 	@go run cmd/main.go
 
