@@ -28,5 +28,7 @@ func NewMySQLClient() (*gorm.DB, error) {
 		&models.Cell{},
 	)
 
+	db.LogMode(true)
+
 	return db, nil
 }

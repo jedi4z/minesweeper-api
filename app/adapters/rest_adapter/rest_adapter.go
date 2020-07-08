@@ -22,6 +22,7 @@ func NewRestEngine(c container.Container) *gin.Engine {
 		v1.POST("/games", s.createGameHandler)
 		v1.GET("/games", s.listGamesHandler)
 		v1.GET("/games/:id", s.retrieveGameHandler)
+		v1.GET("/cells/:id", s.clickCellHandler)
 	}
 
 	return r
@@ -73,4 +74,33 @@ func (r RestAdapter) retrieveGameHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, game)
+}
+
+func (r RestAdapter) clickCellHandler(c *gin.Context) {
+	sid := c.Param("id")
+	id, err := strconv.ParseUint(sid, 10, 32)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	uid := uint(id)
+	cell, err := r.container.CellUseCases.GetCell(uid)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	game, err := r.container.GameUseCases.GetGameByCellID(cell.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := r.container.CellUseCases.ClickCell(cell, game); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, cell)
 }

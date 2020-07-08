@@ -29,3 +29,7 @@ func (uc GameUseCases) ListGames() ([]models.Game, error) {
 func (uc GameUseCases) GetGame(id uint) (*models.Game, error) {
 	return uc.GameRepository.Find(id)
 }
+
+func (uc GameUseCases) GetGameByCellID(cellID uint) (*models.Game, error) {
+	return uc.GameRepository.FindOneByCellID(cellID)
+}

@@ -13,8 +13,10 @@ func InitializeContainer(db *gorm.DB) Container {
 	wire.Build(
 		// repositories
 		mysql_repositories.NewGameRepository,
+		mysql_repositories.NewCellRepository,
 		// use Cases
 		usecases.NewGameUseCases,
+		usecases.NewCellUseCases,
 		// container
 		NewContainer,
 	)
