@@ -1,6 +1,7 @@
 package models
 
 type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	CommonFields
+	Email    string `json:"email" sql:"type:varchar(255);not null"`
+	Password string `json:"-" sql:"type:varchar(255);not null"`
 }

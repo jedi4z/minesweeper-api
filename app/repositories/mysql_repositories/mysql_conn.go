@@ -23,6 +23,7 @@ func NewMySQLClient() (*gorm.DB, error) {
 
 	// Migrate the schema
 	db.AutoMigrate(
+		&models.User{},
 		&models.Game{},
 		&models.Row{},
 		&models.Cell{},

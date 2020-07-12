@@ -19,6 +19,9 @@ func NewRestEngine(c container.Container) *gin.Engine {
 	v1 := r.Group("/v1")
 	{
 		v1.GET("/ping", s.pingHandler)
+
+		v1.POST("/users/register", s.registerUserHandler)
+
 		v1.POST("/games", s.createGameHandler)
 		v1.GET("/games", s.listGamesHandler)
 		v1.GET("/games/:game_id", s.retrieveGameHandler)
@@ -33,6 +36,22 @@ func NewRestEngine(c container.Container) *gin.Engine {
 
 func (r RestAdapter) pingHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "pong"})
+}
+
+func (r RestAdapter) registerUserHandler(c *gin.Context) {
+	user := new(models.User)
+
+	if err := c.ShouldBindJSON(user); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := r.container.UserUseCases.RegisterUser(user); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, user)
 }
 
 func (r RestAdapter) createGameHandler(c *gin.Context) {

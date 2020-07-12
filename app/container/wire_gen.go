@@ -14,8 +14,10 @@ import (
 // Injectors from wire.go:
 
 func InitializeContainer(db *gorm.DB) Container {
+	userRepositoryInterface := mysql_repositories.NewUserRepository(db)
+	userUseCaseInterface := usecases.NewUserUseCase(userRepositoryInterface)
 	gameRepositoryInterface := mysql_repositories.NewGameRepository(db)
 	gameUseCasesInterface := usecases.NewGameUseCases(gameRepositoryInterface)
-	container := NewContainer(gameUseCasesInterface)
+	container := NewContainer(userUseCaseInterface, gameUseCasesInterface)
 	return container
 }

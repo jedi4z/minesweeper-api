@@ -3,6 +3,7 @@ package usecases
 import (
 	"github.com/jedi4z/minesweeper-api/app/models"
 	"github.com/jedi4z/minesweeper-api/app/repositories"
+	log "github.com/sirupsen/logrus"
 )
 
 type GameUseCases struct {
@@ -31,12 +32,14 @@ func (uc GameUseCases) GetGame(id uint) (*models.Game, error) {
 func (uc GameUseCases) HoldGame(id uint) (*models.Game, error) {
 	game, err := uc.GameRepository.Find(id)
 	if err != nil {
+		log.WithError(err).Error()
 		return nil, err
 	}
 
 	game.HoldGame()
 
 	if err := uc.GameRepository.Update(game); err != nil {
+		log.WithError(err).Error()
 		return nil, err
 	}
 
@@ -46,12 +49,14 @@ func (uc GameUseCases) HoldGame(id uint) (*models.Game, error) {
 func (uc GameUseCases) ResumeGame(id uint) (*models.Game, error) {
 	game, err := uc.GameRepository.Find(id)
 	if err != nil {
+		log.WithError(err).Error()
 		return nil, err
 	}
 
 	game.ResumeGame()
 
 	if err := uc.GameRepository.Update(game); err != nil {
+		log.WithError(err).Error()
 		return nil, err
 	}
 
@@ -60,10 +65,13 @@ func (uc GameUseCases) ResumeGame(id uint) (*models.Game, error) {
 
 func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {
 	if game.Status == models.PlayingState {
-		return GameNotPlayableErr
+		err := ErrGameNotPlayable
+		log.WithError(err).Error()
+		return err
 	}
 
 	if err := game.FlagCell(cellID); err != nil {
+		log.WithError(err).Error()
 		return err
 	}
 
@@ -72,7 +80,9 @@ func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {
 
 func (uc GameUseCases) UncoverCell(game *models.Game, cellID uint) error {
 	if game.Status != models.PlayingState {
-		return GameNotPlayableErr
+		err := ErrGameNotPlayable
+		log.WithError(err).Error()
+		return err
 	}
 
 	if err := game.UncoverCell(cellID); err != nil {
