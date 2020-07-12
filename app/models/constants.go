@@ -3,5 +3,10 @@ package models
 const (
 	UncoveredState = "uncovered"
 	CoveredState   = "covered"
-	Flagged        = "flagged"
+	FlaggedState   = "flagged"
+
+	PayingState    = "paying"
+	GameOverState  = "game_over"
+	PreservedState = "preserved"
+	WonState       = "won"
 )
