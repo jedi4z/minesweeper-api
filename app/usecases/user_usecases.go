@@ -25,7 +25,7 @@ func (uc UserUseCase) RegisterUser(user *models.User) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
 	if err != nil {
 		log.WithError(err).Error()
-		return ErrUserRegistration
+		return errUserRegistration
 	}
 
 	user.Password = string(hashedPassword)
@@ -33,12 +33,12 @@ func (uc UserUseCase) RegisterUser(user *models.User) error {
 	unique, err := uc.UserRepository.IsUnique(user)
 	if unique == false {
 		log.WithError(err).Error()
-		return ErrUserAlreadyExist
+		return errUserAlreadyExist
 	}
 
 	if err := uc.UserRepository.Insert(user); err != nil {
 		log.WithError(err).Error()
-		return ErrUserRegistration
+		return errUserRegistration
 	}
 
 	return nil

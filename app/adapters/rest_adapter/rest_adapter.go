@@ -19,16 +19,18 @@ func NewRestEngine(c container.Container) *gin.Engine {
 	v1 := r.Group("/v1")
 	{
 		v1.GET("/ping", s.pingHandler)
-
 		v1.POST("/users/register", s.registerUserHandler)
 
-		v1.POST("/games", s.createGameHandler)
-		v1.GET("/games", s.listGamesHandler)
-		v1.GET("/games/:game_id", s.retrieveGameHandler)
-		v1.POST("/games/:game_id/hold", s.holdGameHandler)
-		v1.POST("/games/:game_id/resume", s.resumeGameHandler)
-		v1.POST("/games/:game_id/flag/:cell_id", s.flagCellHandler)
-		v1.POST("/games/:game_id/uncover/:cell_id", s.uncoverCellHandler)
+		userResource := v1.Use(CredentialExtractorMiddleware())
+		{
+			userResource.POST("/games", s.createGameHandler)
+			userResource.GET("/games", s.listGamesHandler)
+			userResource.GET("/games/:game_id", s.retrieveGameHandler)
+			userResource.POST("/games/:game_id/hold", s.holdGameHandler)
+			userResource.POST("/games/:game_id/resume", s.resumeGameHandler)
+			userResource.POST("/games/:game_id/flag/:cell_id", s.flagCellHandler)
+			userResource.POST("/games/:game_id/uncover/:cell_id", s.uncoverCellHandler)
+		}
 	}
 
 	return r

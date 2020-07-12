@@ -83,7 +83,7 @@ func (g *Game) FlagCell(cellID uint) error {
 		}
 	}
 
-	return ErrCellNotFound
+	return errCellNotFound
 }
 
 func (g *Game) GameOver() {
@@ -123,7 +123,7 @@ func (g *Game) UncoverCell(cellID uint) error {
 		}
 	}
 
-	return ErrCellNotFound
+	return errCellNotFound
 }
 
 func (g *Game) CheckIfWon() {

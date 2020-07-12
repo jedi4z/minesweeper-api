@@ -65,7 +65,7 @@ func (uc GameUseCases) ResumeGame(id uint) (*models.Game, error) {
 
 func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {
 	if game.Status == models.PlayingState {
-		err := ErrGameNotPlayable
+		err := errGameNotPlayable
 		log.WithError(err).Error()
 		return err
 	}
@@ -80,7 +80,7 @@ func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {
 
 func (uc GameUseCases) UncoverCell(game *models.Game, cellID uint) error {
 	if game.Status != models.PlayingState {
-		err := ErrGameNotPlayable
+		err := errGameNotPlayable
 		log.WithError(err).Error()
 		return err
 	}
