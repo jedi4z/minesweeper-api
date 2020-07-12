@@ -13,6 +13,14 @@ type Game struct {
 	Grid          []*Row `json:"grid,omitempty" sql:"foreignkey:GameID"`
 }
 
+func (g *Game) HoldGame() {
+	g.Status = OnHoldState
+}
+
+func (g *Game) ResumeGame() {
+	g.Status = PlayingState
+}
+
 func (g *Game) CreateGrid() {
 	rows := make([]*Row, 0)
 	for rowIndex := 0; rowIndex < g.NumberOfRows; rowIndex++ {

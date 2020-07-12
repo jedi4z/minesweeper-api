@@ -28,6 +28,36 @@ func (uc GameUseCases) GetGame(id uint) (*models.Game, error) {
 	return uc.GameRepository.Find(id)
 }
 
+func (uc GameUseCases) HoldGame(id uint) (*models.Game, error) {
+	game, err := uc.GameRepository.Find(id)
+	if err != nil {
+		return nil, err
+	}
+
+	game.HoldGame()
+
+	if err := uc.GameRepository.Update(game); err != nil {
+		return nil, err
+	}
+
+	return game, nil
+}
+
+func (uc GameUseCases) ResumeGame(id uint) (*models.Game, error) {
+	game, err := uc.GameRepository.Find(id)
+	if err != nil {
+		return nil, err
+	}
+
+	game.ResumeGame()
+
+	if err := uc.GameRepository.Update(game); err != nil {
+		return nil, err
+	}
+
+	return game, nil
+}
+
 func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {
 	if game.Status == models.PlayingState {
 		return GameNotPlayableErr
