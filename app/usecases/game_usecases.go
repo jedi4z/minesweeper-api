@@ -49,5 +49,7 @@ func (uc GameUseCases) UncoverCell(game *models.Game, cellID uint) error {
 		return err
 	}
 
+	game.CheckIfWon()
+
 	return uc.GameRepository.Update(game)
 }

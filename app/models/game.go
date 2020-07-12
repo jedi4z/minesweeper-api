@@ -117,3 +117,21 @@ func (g *Game) UncoverCell(cellID uint) error {
 
 	return cellNotFoundErr
 }
+
+func (g *Game) CheckIfWon() {
+	uncoveredCells := 0
+	for i := 0; i < g.NumberOfRows; i++ {
+		for j := 0; j < g.NumberOfCols; j++ {
+			cell := g.Grid[i].Cells[j]
+
+			if cell.Status == UncoveredState {
+				uncoveredCells++
+			}
+		}
+	}
+
+	// if all non-mine cells are uncovered the game status y changed to won
+	if uncoveredCells == ((g.NumberOfRows * g.NumberOfCols) - g.NumberOfMines) {
+		g.Status = WonState
+	}
+}
