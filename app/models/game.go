@@ -59,6 +59,23 @@ func (g *Game) InitGame() {
 	g.CreateGrid()
 	g.SeedMines()
 	g.CountNeighbors()
+
+	g.Status = PlayingState
+}
+
+func (g *Game) FlagCell(cellID uint) error {
+	for i := 0; i < g.NumberOfRows; i++ {
+		for j := 0; j < g.NumberOfCols; j++ {
+			cell := g.Grid[i].Cells[j]
+
+			if cell.ID == cellID {
+				cell.Fag()
+				return nil
+			}
+		}
+	}
+
+	return cellNotFound
 }
 
 func (g *Game) GameOver() {

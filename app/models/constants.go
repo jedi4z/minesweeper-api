@@ -5,7 +5,7 @@ const (
 	CoveredState   = "covered"
 	FlaggedState   = "flagged"
 
-	PayingState    = "paying"
+	PlayingState   = "playing"
 	GameOverState  = "game_over"
 	PreservedState = "preserved"
 	WonState       = "won"

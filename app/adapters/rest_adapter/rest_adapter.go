@@ -22,6 +22,7 @@ func NewRestEngine(c container.Container) *gin.Engine {
 		v1.POST("/games", s.createGameHandler)
 		v1.GET("/games", s.listGamesHandler)
 		v1.GET("/games/:game_id", s.retrieveGameHandler)
+		v1.GET("/games/:game_id/flag/:cell_id", s.flagCellHandler)
 		v1.GET("/games/:game_id/uncover/:cell_id", s.uncoverCellHandler)
 	}
 
@@ -76,6 +77,33 @@ func (r RestAdapter) retrieveGameHandler(c *gin.Context) {
 
 	game, err := r.container.GameUseCases.GetGame(gameID)
 	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, game)
+}
+
+func (r RestAdapter) flagCellHandler(c *gin.Context) {
+	gameID, err := paramUint(c, "game_id")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	cellID, err := paramUint(c, "cell_id")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	game, err := r.container.GameUseCases.GetGame(gameID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := r.container.GameUseCases.FlagCell(game, cellID); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

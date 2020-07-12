@@ -28,10 +28,16 @@ func (uc GameUseCases) GetGame(id uint) (*models.Game, error) {
 	return uc.GameRepository.Find(id)
 }
 
+func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {
+	if err := game.FlagCell(cellID); err != nil {
+		return err
+	}
+	return uc.GameRepository.Update(game)
+}
+
 func (uc GameUseCases) UncoverCell(game *models.Game, cellID uint) error {
 	if err := game.UncoverCell(cellID); err != nil {
 		return err
 	}
-
 	return uc.GameRepository.Update(game)
 }
