@@ -13,5 +13,12 @@ services:
   service:
     build: .
     restart: always
+    depends_on:
+      - database
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
     ports:
       - 8080:8080

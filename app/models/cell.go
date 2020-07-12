@@ -2,11 +2,12 @@ package models
 
 type Cell struct {
 	CommonFields
-	HasMine     bool `json:"has_mine"`
-	MinesAround int  `json:"mines_around,omitempty"`
-	RowIndex    int  `json:"row"`
-	ColIndex    int  `json:"col"`
-	RowID       uint `json:"-"`
+	HasMine     bool   `json:"-" sql:"type:bool"`
+	Status      string `json:"status" sql:"type:varchar(10)"`
+	MinesAround int    `json:"mines_around,omitempty" sql:"type:int"`
+	RowIndex    int    `json:"row_index" sql:"type:int"`
+	ColIndex    int    `json:"col_index" sql:"type:int"`
+	RowID       uint   `json:"-"`
 }
 
 func isOnMap(row, col int, game *Game) bool {
@@ -15,11 +16,13 @@ func isOnMap(row, col int, game *Game) bool {
 
 func (c *Cell) CountMinesAround(game *Game) {
 	mines := 0
-	for i := -1; i <= 1; i++ {
-		for j := -1; j <= 1; j++ {
 
-			if isOnMap(c.RowIndex+i, c.ColIndex+j, game) {
-				cell := game.Grid[c.RowIndex+i].Cells[c.ColIndex+j]
+	for xOff := -1; xOff <= 1; xOff++ {
+		for yOff := -1; yOff <= 1; yOff++ {
+			i, j := c.RowIndex+xOff, c.ColIndex+yOff
+
+			if isOnMap(i, j, game) {
+				cell := game.Grid[i].Cells[j]
 
 				if cell.HasMine {
 					mines++

@@ -17,6 +17,7 @@ func (g *Game) CreateGrid() {
 		cells := make([]*Cell, 0)
 		for colIndex := 0; colIndex < g.NumberOfCols; colIndex++ {
 			cells = append(cells, &Cell{
+				Status:   UncoveredState,
 				RowIndex: rowIndex,
 				ColIndex: colIndex,
 			})
