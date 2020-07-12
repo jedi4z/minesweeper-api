@@ -2,7 +2,6 @@ package rest_adapter
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"strings"
 )
 
@@ -11,19 +10,15 @@ func CredentialExtractorMiddleware() gin.HandlerFunc {
 		accessToken := c.Request.Header.Get(AuthorizationHeaderKey)
 
 		if accessToken == "" {
-			c.AbortWithStatusJSON(
-				http.StatusBadRequest,
-				gin.H{"error": errCredentialRequired.Error()},
-			)
+			restErr := newBadRequestRestError(errCredentialRequired)
+			c.AbortWithStatusJSON(restErr.StatusCode, restErr)
 			return
 		}
 
 		fs := strings.Fields(accessToken)
 		if fs[0] != BearerAccessTokenKey {
-			c.AbortWithStatusJSON(
-				http.StatusBadRequest,
-				gin.H{"error": errInvalidAccessToken.Error()},
-			)
+			restErr := newBadRequestRestError(errInvalidAccessToken)
+			c.AbortWithStatusJSON(restErr.StatusCode, restErr)
 			return
 		}
 
