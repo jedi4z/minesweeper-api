@@ -41,6 +41,11 @@ func (r RestAdapter) pingHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "pong"})
 }
 
+func (r RestAdapter) checkUserCredentials(c *gin.Context) (*models.User, error) {
+	accessToken := c.MustGet(AccessTokenKey).(string)
+	return r.container.UserUseCases.FindByAccessToken(accessToken)
+}
+
 func (r RestAdapter) registerUserHandler(c *gin.Context) {
 	user := new(models.User)
 
@@ -75,12 +80,19 @@ func (r RestAdapter) authUserHandler(c *gin.Context) {
 }
 
 func (r RestAdapter) createGameHandler(c *gin.Context) {
-	game := new(models.Game)
+	user, err := r.checkUserCredentials(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errUserUnauthorized.Error()})
+		return
+	}
 
+	game := new(models.Game)
 	if err := c.ShouldBindJSON(game); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	game.User = user
 
 	if err := r.container.GameUseCases.CreateGame(game); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -91,7 +103,13 @@ func (r RestAdapter) createGameHandler(c *gin.Context) {
 }
 
 func (r RestAdapter) listGamesHandler(c *gin.Context) {
-	games, err := r.container.GameUseCases.ListGames()
+	user, err := r.checkUserCredentials(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errUserUnauthorized.Error()})
+		return
+	}
+
+	games, err := r.container.GameUseCases.ListGames(user)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -110,13 +128,19 @@ func paramUint(c *gin.Context, key string) (uint, error) {
 }
 
 func (r RestAdapter) retrieveGameHandler(c *gin.Context) {
+	user, err := r.checkUserCredentials(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errUserUnauthorized.Error()})
+		return
+	}
+
 	gameID, err := paramUint(c, "game_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	game, err := r.container.GameUseCases.GetGame(gameID)
+	game, err := r.container.GameUseCases.GetGame(user, gameID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -126,14 +150,25 @@ func (r RestAdapter) retrieveGameHandler(c *gin.Context) {
 }
 
 func (r RestAdapter) holdGameHandler(c *gin.Context) {
+	user, err := r.checkUserCredentials(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errUserUnauthorized.Error()})
+		return
+	}
+
 	gameID, err := paramUint(c, "game_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	game, err := r.container.GameUseCases.HoldGame(gameID)
+	game, err := r.container.GameUseCases.GetGame(user, gameID)
 	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := r.container.GameUseCases.HoldGame(game); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -142,14 +177,25 @@ func (r RestAdapter) holdGameHandler(c *gin.Context) {
 }
 
 func (r RestAdapter) resumeGameHandler(c *gin.Context) {
+	user, err := r.checkUserCredentials(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errUserUnauthorized.Error()})
+		return
+	}
+
 	gameID, err := paramUint(c, "game_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	game, err := r.container.GameUseCases.ResumeGame(gameID)
+	game, err := r.container.GameUseCases.GetGame(user, gameID)
 	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := r.container.GameUseCases.ResumeGame(game); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -158,6 +204,12 @@ func (r RestAdapter) resumeGameHandler(c *gin.Context) {
 }
 
 func (r RestAdapter) flagCellHandler(c *gin.Context) {
+	user, err := r.checkUserCredentials(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errUserUnauthorized.Error()})
+		return
+	}
+
 	gameID, err := paramUint(c, "game_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
@@ -170,7 +222,7 @@ func (r RestAdapter) flagCellHandler(c *gin.Context) {
 		return
 	}
 
-	game, err := r.container.GameUseCases.GetGame(gameID)
+	game, err := r.container.GameUseCases.GetGame(user, gameID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -185,6 +237,12 @@ func (r RestAdapter) flagCellHandler(c *gin.Context) {
 }
 
 func (r RestAdapter) uncoverCellHandler(c *gin.Context) {
+	user, err := r.checkUserCredentials(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errUserUnauthorized.Error()})
+		return
+	}
+
 	gameID, err := paramUint(c, "game_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
@@ -197,7 +255,7 @@ func (r RestAdapter) uncoverCellHandler(c *gin.Context) {
 		return
 	}
 
-	game, err := r.container.GameUseCases.GetGame(gameID)
+	game, err := r.container.GameUseCases.GetGame(user, gameID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

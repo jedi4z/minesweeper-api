@@ -21,46 +21,34 @@ func (uc GameUseCases) CreateGame(game *models.Game) error {
 	return uc.GameRepository.Insert(game)
 }
 
-func (uc GameUseCases) ListGames() ([]models.Game, error) {
-	return uc.GameRepository.FindAll()
+func (uc GameUseCases) ListGames(user *models.User) ([]models.Game, error) {
+	return uc.GameRepository.FindAll(user)
 }
 
-func (uc GameUseCases) GetGame(id uint) (*models.Game, error) {
-	return uc.GameRepository.Find(id)
+func (uc GameUseCases) GetGame(user *models.User, id uint) (*models.Game, error) {
+	return uc.GameRepository.Find(user, id)
 }
 
-func (uc GameUseCases) HoldGame(id uint) (*models.Game, error) {
-	game, err := uc.GameRepository.Find(id)
-	if err != nil {
-		log.WithError(err).Error()
-		return nil, err
-	}
-
+func (uc GameUseCases) HoldGame(game *models.Game) error {
 	game.HoldGame()
 
 	if err := uc.GameRepository.Update(game); err != nil {
 		log.WithError(err).Error()
-		return nil, err
+		return err
 	}
 
-	return game, nil
+	return nil
 }
 
-func (uc GameUseCases) ResumeGame(id uint) (*models.Game, error) {
-	game, err := uc.GameRepository.Find(id)
-	if err != nil {
-		log.WithError(err).Error()
-		return nil, err
-	}
-
+func (uc GameUseCases) ResumeGame(game *models.Game) error {
 	game.ResumeGame()
 
 	if err := uc.GameRepository.Update(game); err != nil {
 		log.WithError(err).Error()
-		return nil, err
+		return err
 	}
 
-	return game, nil
+	return nil
 }
 
 func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {

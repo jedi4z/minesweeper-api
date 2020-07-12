@@ -1,7 +1,3 @@
-// Package registration represents the concrete implementation of UserCaseInterface interface.
-// Because the same business function can be created to support both transaction and non-transaction,
-// a shared business function is created in a helper file, then we can wrap that function with transaction
-// or non-transaction.
 package usecases
 
 import (
@@ -12,6 +8,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
+
+const secret = "this-should-be-in-a-secure-place"
 
 type UserUseCase struct {
 	UserRepository repositories.UserRepositoryInterface
@@ -70,7 +68,7 @@ func (uc UserUseCase) AuthenticateUser(user *models.User) (*string, error) {
 	}
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secret := "this-should-be-in-a-secure-place"
+
 	token, err := at.SignedString([]byte(secret))
 	if err != nil {
 		log.WithError(err).Error()
@@ -78,4 +76,29 @@ func (uc UserUseCase) AuthenticateUser(user *models.User) (*string, error) {
 	}
 
 	return &token, nil
+}
+
+func verifyAccessToken(at string) (*models.Claims, error) {
+	claims := &models.Claims{}
+
+	tkn, err := jwt.ParseWithClaims(at, claims, func(tk *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if err != nil || !tkn.Valid {
+		log.WithError(err).Error()
+		return nil, ErrUnauthorizedUser
+	}
+
+	return claims, nil
+}
+
+func (uc UserUseCase) FindByAccessToken(accessToken string) (*models.User, error) {
+	claims, err := verifyAccessToken(accessToken)
+	if err != nil {
+		log.WithError(err).Error()
+		return nil, err
+	}
+
+	// retrieve the user from database to check if exists
+	return uc.UserRepository.FindOne(claims.ID)
 }

@@ -35,9 +35,9 @@ func (r UserRepository) IsUnique(u *models.User) (bool, error) {
 	return !e.Result, nil
 }
 
-func (r UserRepository) FindOne(id string) (*models.User, error) {
+func (r UserRepository) FindOne(id uint) (*models.User, error) {
 	user := &models.User{}
-	if err := r.DB.Where("ID = ?", id).First(user).Error; err != nil {
+	if err := r.DB.First(user, id).Error; err != nil {
 		return nil, err
 	}
 

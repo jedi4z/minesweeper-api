@@ -11,6 +11,8 @@ type Game struct {
 	NumberOfRows  int    `json:"number_of_rows" sql:"type:int"`
 	NumberOfMines int    `json:"number_of_mines" sql:"type:int"`
 	Grid          []*Row `json:"grid,omitempty" sql:"foreignkey:GameID"`
+	User          *User  `json:"-"`
+	UserID        uint   `json:"user_id"`
 }
 
 func (g *Game) HoldGame() {
