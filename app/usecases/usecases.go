@@ -4,7 +4,7 @@ import "github.com/jedi4z/minesweeper-api/app/models"
 
 type UserUseCaseInterface interface {
 	RegisterUser(user *models.User) error
-	AuthenticateUser(email string, password string) (*string, error)
+	AuthenticateUser(user *models.User) (*string, error)
 }
 
 type GameUseCasesInterface interface {

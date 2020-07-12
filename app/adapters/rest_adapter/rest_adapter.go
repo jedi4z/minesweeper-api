@@ -20,6 +20,7 @@ func NewRestEngine(c container.Container) *gin.Engine {
 	{
 		v1.GET("/ping", s.pingHandler)
 		v1.POST("/users/register", s.registerUserHandler)
+		v1.POST("/users/auth", s.authUserHandler)
 
 		userResource := v1.Use(CredentialExtractorMiddleware())
 		{
@@ -54,6 +55,23 @@ func (r RestAdapter) registerUserHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, user)
+}
+
+func (r RestAdapter) authUserHandler(c *gin.Context) {
+	user := new(models.User)
+
+	if err := c.ShouldBindJSON(user); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	accessToken, err := r.container.UserUseCases.AuthenticateUser(user)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"access_token": accessToken})
 }
 
 func (r RestAdapter) createGameHandler(c *gin.Context) {

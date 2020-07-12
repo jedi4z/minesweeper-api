@@ -5,10 +5,12 @@
 package usecases
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/jedi4z/minesweeper-api/app/models"
 	"github.com/jedi4z/minesweeper-api/app/repositories"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type UserUseCase struct {
@@ -44,6 +46,36 @@ func (uc UserUseCase) RegisterUser(user *models.User) error {
 	return nil
 }
 
-func (uc UserUseCase) AuthenticateUser(email string, password string) (*string, error) {
-	panic("not implemented")
+func (uc UserUseCase) AuthenticateUser(user *models.User) (*string, error) {
+	email, password := user.Email, user.Password
+
+	u, err := uc.UserRepository.FindOneByEmail(email)
+	if err != nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		log.WithError(err).Error()
+		return nil, ErrInvalidCredentials
+	}
+
+	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
+	claims := &models.Claims{
+		ID:    u.CommonFields.ID,
+		Email: u.Email,
+		StandardClaims: &jwt.StandardClaims{
+			ExpiresAt: expiresAt,
+		},
+	}
+
+	at := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secret := "this-should-be-in-a-secure-place"
+	token, err := at.SignedString([]byte(secret))
+	if err != nil {
+		log.WithError(err).Error()
+		return nil, ErrInvalidCredentials
+	}
+
+	return &token, nil
 }
