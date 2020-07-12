@@ -44,18 +44,6 @@ func (r GameRepository) Find(id uint) (*models.Game, error) {
 	return game, nil
 }
 
-func (r GameRepository) FindOneByCellID(cellID uint) (*models.Game, error) {
-	game := new(models.Game)
-
-	if err := r.DB.
-		Preload("Grid").
-		Preload("Grid.Cells").
-		Joins("JOIN `rows` AS r ON r.game_id = games.id").
-		Joins("JOIN `cells` AS c ON c.row_id = r.id").
-		Where("c.id = ?", cellID).
-		First(game).Error; err != nil {
-		return nil, err
-	}
-
-	return game, nil
+func (r GameRepository) Update(game *models.Game) error {
+	return r.DB.Model(&models.Game{}).Updates(game).Error
 }

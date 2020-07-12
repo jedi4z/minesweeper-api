@@ -16,8 +16,6 @@ import (
 func InitializeContainer(db *gorm.DB) Container {
 	gameRepositoryInterface := mysql_repositories.NewGameRepository(db)
 	gameUseCasesInterface := usecases.NewGameUseCases(gameRepositoryInterface)
-	cellRepositoryInterface := mysql_repositories.NewCellRepository(db)
-	cellUseCasesInterface := usecases.NewCellUseCases(cellRepositoryInterface)
-	container := NewContainer(gameUseCasesInterface, cellUseCasesInterface)
+	container := NewContainer(gameUseCasesInterface)
 	return container
 }

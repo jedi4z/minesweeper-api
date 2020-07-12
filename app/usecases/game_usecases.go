@@ -16,9 +16,7 @@ func NewGameUseCases(r repositories.GameRepositoryInterface) GameUseCasesInterfa
 }
 
 func (uc GameUseCases) CreateGame(game *models.Game) error {
-	game.CreateGrid()
-	game.SeedMines()
-
+	game.InitGame()
 	return uc.GameRepository.Insert(game)
 }
 
@@ -30,6 +28,10 @@ func (uc GameUseCases) GetGame(id uint) (*models.Game, error) {
 	return uc.GameRepository.Find(id)
 }
 
-func (uc GameUseCases) GetGameByCellID(cellID uint) (*models.Game, error) {
-	return uc.GameRepository.FindOneByCellID(cellID)
+func (uc GameUseCases) UncoverCell(game *models.Game, cellID uint) error {
+	if err := game.UncoverCell(cellID); err != nil {
+		return err
+	}
+
+	return uc.GameRepository.Update(game)
 }

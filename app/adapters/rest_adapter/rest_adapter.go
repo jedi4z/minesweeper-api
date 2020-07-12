@@ -21,8 +21,8 @@ func NewRestEngine(c container.Container) *gin.Engine {
 		v1.GET("/ping", s.pingHandler)
 		v1.POST("/games", s.createGameHandler)
 		v1.GET("/games", s.listGamesHandler)
-		v1.GET("/games/:id", s.retrieveGameHandler)
-		v1.GET("/cells/:id", s.clickCellHandler)
+		v1.GET("/games/:game_id", s.retrieveGameHandler)
+		v1.GET("/games/:game_id/uncover/:cell_id", s.uncoverCellHandler)
 	}
 
 	return r
@@ -58,16 +58,23 @@ func (r RestAdapter) listGamesHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, games)
 }
 
-func (r RestAdapter) retrieveGameHandler(c *gin.Context) {
-	sid := c.Param("id")
+func paramUint(c *gin.Context, key string) (uint, error) {
+	sid := c.Param(key)
 	id, err := strconv.ParseUint(sid, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return uint(id), nil
+}
+
+func (r RestAdapter) retrieveGameHandler(c *gin.Context) {
+	gameID, err := paramUint(c, "game_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	uid := uint(id)
-	game, err := r.container.GameUseCases.GetGame(uid)
+	game, err := r.container.GameUseCases.GetGame(gameID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -76,31 +83,29 @@ func (r RestAdapter) retrieveGameHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, game)
 }
 
-func (r RestAdapter) clickCellHandler(c *gin.Context) {
-	sid := c.Param("id")
-	id, err := strconv.ParseUint(sid, 10, 32)
+func (r RestAdapter) uncoverCellHandler(c *gin.Context) {
+	gameID, err := paramUint(c, "game_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	uid := uint(id)
-	cell, err := r.container.CellUseCases.GetCell(uid)
+	cellID, err := paramUint(c, "cell_id")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	game, err := r.container.GameUseCases.GetGame(gameID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	game, err := r.container.GameUseCases.GetGameByCellID(cell.ID)
-	if err != nil {
+	if err := r.container.GameUseCases.UncoverCell(game, cellID); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := r.container.CellUseCases.ClickCell(cell, game); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, cell)
+	c.JSON(http.StatusCreated, game)
 }

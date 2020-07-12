@@ -1,6 +1,8 @@
 package models
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 type Game struct {
 	CommonFields
@@ -17,7 +19,7 @@ func (g *Game) CreateGrid() {
 		cells := make([]*Cell, 0)
 		for colIndex := 0; colIndex < g.NumberOfCols; colIndex++ {
 			cells = append(cells, &Cell{
-				Status:   UncoveredState,
+				Status:   CoveredState,
 				RowIndex: rowIndex,
 				ColIndex: colIndex,
 			})
@@ -41,4 +43,34 @@ func (g *Game) SeedMines() {
 			k++
 		}
 	}
+}
+
+func (g *Game) CountNeighbors() {
+	for i := 0; i < g.NumberOfRows; i++ {
+		for j := 0; j < g.NumberOfCols; j++ {
+			cell := g.Grid[i].Cells[j]
+			cell.CountMinesAround(g)
+		}
+	}
+}
+
+func (g *Game) InitGame() {
+	g.CreateGrid()
+	g.SeedMines()
+	g.CountNeighbors()
+}
+
+func (g *Game) UncoverCell(cellID uint) error {
+	for i := 0; i < g.NumberOfRows; i++ {
+		for j := 0; j < g.NumberOfCols; j++ {
+			cell := g.Grid[i].Cells[j]
+
+			if cell.ID == cellID {
+				cell.Uncover()
+				return nil
+			}
+		}
+	}
+
+	return cellNotFound
 }
