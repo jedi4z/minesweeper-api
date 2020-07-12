@@ -67,6 +67,11 @@ func (g *Game) UncoverCell(cellID uint) error {
 
 			if cell.ID == cellID {
 				cell.Uncover()
+
+				if cell.MinesAround == 0 {
+					cell.UncoverNeighbors(g)
+				}
+
 				return nil
 			}
 		}

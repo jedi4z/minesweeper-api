@@ -16,10 +16,6 @@ func isOnMap(row, col int, game *Game) bool {
 
 func (c *Cell) Uncover() {
 	c.Status = UncoveredState
-	//
-	//if c.MinesAround == 0 && c.Status == CoveredState {
-	//	c.UncoverNeighbors(game)
-	//}
 }
 
 func (c *Cell) CountMinesAround(game *Game) {
