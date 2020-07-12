@@ -22,7 +22,7 @@ func NewUserUseCase(r repositories.UserRepositoryInterface) UserUseCaseInterface
 }
 
 func (uc UserUseCase) RegisterUser(user *models.User) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.WithError(err).Error()
 		return errUserRegistration
@@ -45,23 +45,22 @@ func (uc UserUseCase) RegisterUser(user *models.User) error {
 }
 
 func (uc UserUseCase) AuthenticateUser(user *models.User) (*string, error) {
-	email, password := user.Email, user.Password
-
-	u, err := uc.UserRepository.FindOneByEmail(email)
+	userDB, err := uc.UserRepository.FindOneByEmail(user.Email)
 	if err != nil {
-		return nil, ErrInvalidCredentials
+		log.WithError(err).Error()
+		return nil, errInvalidCredentials
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(userDB.Password), []byte(user.Password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		log.WithError(err).Error()
-		return nil, ErrInvalidCredentials
+		return nil, errInvalidCredentials
 	}
 
 	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
 	claims := &models.Claims{
-		ID:    u.CommonFields.ID,
-		Email: u.Email,
+		ID:    userDB.ID,
+		Email: userDB.Email,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: expiresAt,
 		},
@@ -72,7 +71,7 @@ func (uc UserUseCase) AuthenticateUser(user *models.User) (*string, error) {
 	token, err := at.SignedString([]byte(secret))
 	if err != nil {
 		log.WithError(err).Error()
-		return nil, ErrInvalidCredentials
+		return nil, errInvalidCredentials
 	}
 
 	return &token, nil
@@ -86,7 +85,7 @@ func verifyAccessToken(at string) (*models.Claims, error) {
 	})
 	if err != nil || !tkn.Valid {
 		log.WithError(err).Error()
-		return nil, ErrUnauthorizedUser
+		return nil, errUnauthorizedUser
 	}
 
 	return claims, nil

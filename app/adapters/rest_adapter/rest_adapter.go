@@ -61,7 +61,7 @@ func (r RestAdapter) registerUserHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, user)
+	c.JSON(http.StatusCreated, user.SanitizeUser())
 }
 
 func (r RestAdapter) authUserHandler(c *gin.Context) {
