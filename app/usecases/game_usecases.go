@@ -29,15 +29,25 @@ func (uc GameUseCases) GetGame(id uint) (*models.Game, error) {
 }
 
 func (uc GameUseCases) FlagCell(game *models.Game, cellID uint) error {
+	if game.Status == models.PlayingState {
+		return GameNotPlayableErr
+	}
+
 	if err := game.FlagCell(cellID); err != nil {
 		return err
 	}
+
 	return uc.GameRepository.Update(game)
 }
 
 func (uc GameUseCases) UncoverCell(game *models.Game, cellID uint) error {
+	if game.Status != models.PlayingState {
+		return GameNotPlayableErr
+	}
+
 	if err := game.UncoverCell(cellID); err != nil {
 		return err
 	}
+
 	return uc.GameRepository.Update(game)
 }

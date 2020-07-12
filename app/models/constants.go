@@ -5,8 +5,8 @@ const (
 	CoveredState   = "covered"
 	FlaggedState   = "flagged"
 
-	PlayingState   = "playing"
-	GameOverState  = "game_over"
-	PreservedState = "preserved"
-	WonState       = "won"
+	PlayingState  = "playing"
+	GameOverState = "game_over"
+	OnHoldState   = "on_hold"
+	WonState      = "won"
 )

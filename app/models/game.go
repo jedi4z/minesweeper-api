@@ -75,7 +75,7 @@ func (g *Game) FlagCell(cellID uint) error {
 		}
 	}
 
-	return cellNotFound
+	return cellNotFoundErr
 }
 
 func (g *Game) GameOver() {
@@ -115,5 +115,5 @@ func (g *Game) UncoverCell(cellID uint) error {
 		}
 	}
 
-	return cellNotFound
+	return cellNotFoundErr
 }
