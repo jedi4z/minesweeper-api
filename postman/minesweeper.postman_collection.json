@@ -1,0 +1,310 @@
+{
+	"info": {
+		"_postman_id": "adc4e0bd-4c20-41f0-b91d-3ef70d18a135",
+		"name": "Minesweeper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Games",
+			"item": [
+				{
+					"name": "Create Game",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"number_of_rows\": 15,\n    \"number_of_cols\": 15,\n    \"number_of_mines\": 20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/games",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"games"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrive Game",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/v1/games/11",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"games",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Games",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"number_of_rows\": 2,\n    \"number_of_cols\": 4,\n    \"number_of_mines\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/games",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"games"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hold Game",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/v1/games/2/hold",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"games",
+								"2",
+								"hold"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resume Game",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/v1/games/1/resume",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"games",
+								"1",
+								"resume"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Uncover Cell",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/v1/games/1/uncover/28",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"games",
+								"1",
+								"uncover",
+								"28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Flag Cell",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/v1/games/1/flag/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"games",
+								"1",
+								"flag",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n    \"email\": \"jesusdiazbc2@gmail.com\",\n    \"password\": \"demo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/users/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auth User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8d7d7ed2-754f-41f6-a93c-8cd4b059812a",
+								"exec": [
+									"var postmandata = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"access_token\", postmandata.access_token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n    \"email\": \"jesus.diaz@gmail.com\",\n    \"password\": \"demo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/users/auth",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"auth"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/v1/ping",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v1",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
