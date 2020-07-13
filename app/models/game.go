@@ -7,22 +7,25 @@ import (
 type Game struct {
 	CommonFields
 	Status        string `json:"status" sql:"type:varchar(10)"`
-	NumberOfCols  int    `json:"number_of_cols" sql:"type:int"`
-	NumberOfRows  int    `json:"number_of_rows" sql:"type:int"`
-	NumberOfMines int    `json:"number_of_mines" sql:"type:int"`
+	NumberOfCols  int    `json:"number_of_cols" sql:"type:int;not null" binding:"required"`
+	NumberOfRows  int    `json:"number_of_rows" sql:"type:int;not null" binding:"required"`
+	NumberOfMines int    `json:"number_of_mines" sql:"type:int;not null" binding:"required"`
 	Grid          []*Row `json:"grid,omitempty" sql:"foreignkey:GameID"`
 	User          *User  `json:"-"`
 	UserID        uint   `json:"user_id"`
 }
 
+// Changes the Game status to OnHold
 func (g *Game) HoldGame() {
 	g.Status = OnHoldState
 }
 
+// Changes the Game status to Playing
 func (g *Game) ResumeGame() {
 	g.Status = PlayingState
 }
 
+// Creates a new grid for a Game
 func (g *Game) CreateGrid() {
 	rows := make([]*Row, 0)
 	for rowIndex := 0; rowIndex < g.NumberOfRows; rowIndex++ {
@@ -42,6 +45,7 @@ func (g *Game) CreateGrid() {
 	g.Grid = rows
 }
 
+// Seeds the mines in the grid
 func (g *Game) SeedMines() {
 	k := 0
 	for k < g.NumberOfMines {
@@ -56,6 +60,8 @@ func (g *Game) SeedMines() {
 	}
 }
 
+// Counts how many neighbors there are near
+// to all cells in the grid
 func (g *Game) CountNeighbors() {
 	for i := 0; i < g.NumberOfRows; i++ {
 		for j := 0; j < g.NumberOfCols; j++ {
@@ -65,6 +71,8 @@ func (g *Game) CountNeighbors() {
 	}
 }
 
+// Initialize the Game creating a grid, seeding the mines
+// and counting the mines near to the cells
 func (g *Game) InitGame() {
 	g.CreateGrid()
 	g.SeedMines()
@@ -140,7 +148,7 @@ func (g *Game) CheckIfWon() {
 		}
 	}
 
-	// if all non-mine cells are uncovered the game status y changed to won
+	// if all non-mine cells are uncovered the game status is changed to won
 	if uncoveredCells == ((g.NumberOfRows * g.NumberOfCols) - g.NumberOfMines) {
 		g.Status = WonState
 	}

@@ -10,10 +10,12 @@ type Cell struct {
 	RowID       uint   `json:"-"`
 }
 
+// Changes the Cell status as Uncover
 func (c *Cell) Uncover() {
 	c.Status = UncoveredState
 }
 
+// Changes the Cell status as Flagged
 func (c *Cell) Fag() {
 	c.Status = FlaggedState
 }
@@ -22,6 +24,7 @@ func isOnMap(row, col int, game *Game) bool {
 	return row >= 0 && col >= 0 && row < game.NumberOfRows && col < game.NumberOfCols
 }
 
+// Counts how many mines are around a cell
 func (c *Cell) CountMinesAround(game *Game) {
 	mines := 0
 	for xOff := -1; xOff <= 1; xOff++ {
@@ -41,6 +44,7 @@ func (c *Cell) CountMinesAround(game *Game) {
 	c.MinesAround = mines
 }
 
+// Uncovers all Neighbors with no mine and covered state
 func (c *Cell) UncoverNeighbors(game *Game) {
 	for xOff := -1; xOff <= 1; xOff++ {
 		for yOff := -1; yOff <= 1; yOff++ {
