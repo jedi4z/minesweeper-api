@@ -3,17 +3,17 @@
 This is API rest written in GO that allows you to play the classic game [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game))
 
 # Top level project structure
-- app/adapter: this is the interface between your application and outside data service, for example another Rest or gRPC service. All the data conversion and transformation happened here, so your business logic code doesn’t need to be aware of the detail implementation (whether it gRPC or REST) of outside services.
-- app/container: the dependency injection container, which is responsible for creating concrete types and injecting them into each function.
-- app/models: domain module layer, which has domain structs. All other layers depend on them and they don’t depend on any other layers.
-- app/repositories: persistence layer, which is responsible for retrieving and modifying data for the domain model. It only depends on the model layer.
-- app/usecases: This is an important layer and the entry point of business logic. Each business feature is implemented by a use case. It is the top level layer, so no other layer depends on it ( except “cmd”), but it depends on other layers.
-- cmd: the command. All different types of “main.go” are here and you can have multiple ones. This is the starting point of the application.
+- **app/adapter:** this is the interface between your application and outside data service, for example another Rest or gRPC service. All the data conversion and transformation happened here, so your business logic code doesn’t need to be aware of the detail implementation (whether it gRPC or REST) of outside services.
+- **app/container:** the dependency injection container, which is responsible for creating concrete types and injecting them into each function.
+- **app/models:** domain module layer, which has domain structs. All other layers depend on them and they don’t depend on any other layers.
+- **app/repositories:** persistence layer, which is responsible for retrieving and modifying data for the domain model. It only depends on the model layer.
+- **app/usecases:** This is an important layer and the entry point of business logic. Each business feature is implemented by a use case. It is the top level layer, so no other layer depends on it ( except “cmd”), but it depends on other layers.
+- **cmd:** the command. All different types of “main.go” are here and you can have multiple ones. This is the starting point of the application.
 
 
 # API
 Here are the endpoints that need to be used to play the game, also there are a Postman collection and environment to test the API.
-Please, see here. 
+Please, see [the postman folder](https://github.com/jedi4z/minesweeper-api/tree/master/postman). 
 
 ## User
 
@@ -119,7 +119,7 @@ Authorization: Bearer <access_token>
 I created a python library to make requests to the API. For more information please go to this repository: https://github.com/jedi4z/minesweeper-api-lib
 
 # TODO
-- Add a configuration module using https://github.com/spf13/viper
+- Add a configuration module using [Viper](https://github.com/spf13/viper)
 - Testing (unit tests and functional tests).
 - Document the API using swagger.
 - Configure CI/CD with any tool like CircleCI, Jenkins or Github Actions.  
