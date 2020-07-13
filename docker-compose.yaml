@@ -1,20 +1,9 @@
 version: "3"
 services:
 
-  database:
-    image: mysql:8.0
-    restart: always
-    environment:
-      MYSQL_DATABASE: minesweeper
-      MYSQL_USER: minesweeper_user
-      MYSQL_PASSWORD: qwerty
-      MYSQL_ROOT_PASSWORD: root_pass
-
   service:
     build: .
     restart: always
-    depends_on:
-      - database
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/v1/ping"]
       interval: 10s

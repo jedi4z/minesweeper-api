@@ -1,23 +1,16 @@
 package mysql_repositories
 
 import (
-	"fmt"
 	"github.com/jedi4z/minesweeper-api/app/models"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	log "github.com/sirupsen/logrus"
 )
 
 func NewMySQLClient() (*gorm.DB, error) {
-	connectionUri := fmt.Sprintf(
-		"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		"minesweeper_user",
-		"qwerty",
-		"database",
-		"minesweeper",
-	)
-
-	db, err := gorm.Open("mysql", connectionUri)
+	db, err := gorm.Open("sqlite3", "/tmp/minesweeper.db")
 	if err != nil {
+		log.WithError(err).Error()
 		return nil, err
 	}
 
@@ -28,8 +21,6 @@ func NewMySQLClient() (*gorm.DB, error) {
 		&models.Row{},
 		&models.Cell{},
 	)
-
-	db.LogMode(true)
 
 	return db, nil
 }

@@ -291,7 +291,7 @@ func (r RestAdapter) uncoverCellHandler(c *gin.Context) {
 	}
 
 	if err := r.container.GameUseCases.UncoverCell(game, cellID); err != nil {
-		restErr := newInternalServerRestError(err)
+		restErr := newBadRequestRestError(err)
 		c.AbortWithStatusJSON(restErr.StatusCode, restErr)
 		return
 	}
