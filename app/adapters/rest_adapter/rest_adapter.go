@@ -56,7 +56,7 @@ func (r RestAdapter) registerUserHandler(c *gin.Context) {
 	}
 
 	if err := r.container.UserUseCases.RegisterUser(user); err != nil {
-		restErr := newInternalServerRestError(err)
+		restErr := newBadRequestRestError(err)
 		c.AbortWithStatusJSON(restErr.StatusCode, restErr)
 		return
 	}
