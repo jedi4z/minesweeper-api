@@ -72,11 +72,6 @@ Host: https://minesweeper-jd.herokuapp.com
 Authorization: Bearer <access_token>
 Content-Type: application/json
 
-{
-    "number_of_rows": 2,
-    "number_of_cols": 4,
-    "number_of_mines": 30
-}
 ```
 
 ### Hold a Game
@@ -84,7 +79,6 @@ Content-Type: application/json
 POST /v1/games/<game_id>/hold HTTP/1.1
 Host: https://minesweeper-jd.herokuapp.com
 Authorization: Bearer <access_token>
-
 
 ```
 
@@ -94,7 +88,6 @@ POST /v1/games/<game_id>/resume HTTP/1.1
 Host: https://minesweeper-jd.herokuapp.com
 Authorization: Bearer <access_token>
 
-
 ```
 
 ### Uncover a Cell
@@ -103,7 +96,6 @@ POST /v1/games/<game_id>/uncover/<cell_id> HTTP/1.1
 Host: https://minesweeper-jd.herokuapp.com
 Authorization: Bearer <access_token>
 
-
 ```
 
 ### Flag a Cell
@@ -111,7 +103,6 @@ Authorization: Bearer <access_token>
 POST /v1/games/<game_id>/flag/<cell_id> HTTP/1.1
 Host: https://minesweeper-jd.herokuapp.com
 Authorization: Bearer <access_token>
-
 
 ```
 
