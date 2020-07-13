@@ -17,7 +17,7 @@ func main() {
 	c := container.InitializeContainer(db)
 	r := rest_adapter.NewRestEngine(c)
 
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":80"); err != nil {
 		log.Panicf("failed to initialize the interface engine: %v", err)
 	}
 }
