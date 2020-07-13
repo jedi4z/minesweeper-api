@@ -1,39 +1,125 @@
-# minesweeper-API
-API test
+# Minesweeper-API
 
-We ask that you complete the following challenge to evaluate your development skills. Please use the programming language and framework discussed during your interview to accomplish the following task.
+This is API rest written in GO that allows you to play the classic game [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game))
 
-PLEASE DO NOT FORK THE REPOSITORY. WE NEED A PUBLIC REPOSITORY FOR THE REVIEW. 
+# Top level project structure
+- app/adapter: this is the interface between your application and outside data service, for example another Rest or gRPC service. All the data conversion and transformation happened here, so your business logic code doesn’t need to be aware of the detail implementation (whether it gRPC or REST) of outside services.
+- app/container: the dependency injection container, which is responsible for creating concrete types and injecting them into each function.
+- app/models: domain module layer, which has domain structs. All other layers depend on them and they don’t depend on any other layers.
+- app/repositories: persistence layer, which is responsible for retrieving and modifying data for the domain model. It only depends on the model layer.
+- app/usecases: This is an important layer and the entry point of business logic. Each business feature is implemented by a use case. It is the top level layer, so no other layer depends on it ( except “cmd”), but it depends on other layers.
+- cmd: the command. All different types of “main.go” are here and you can have multiple ones. This is the starting point of the application.
 
-## The Game
-Develop the classic game of [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game))
 
-## Show your work
+# API
+Here are the endpoints that need to be used to play the game, also there are a Postman collection and environment to test the API.
+Please, see here. 
 
-1.  Create a Public repository ( please dont make a pull request, clone the private repository and create a new plublic one on your profile)
-2.  Commit each step of your process so we can follow your thought process.
+## User
 
-## What to build
-The following is a list of items (prioritized from most important to least important) we wish to see:
-* Design and implement  a documented RESTful API for the game (think of a mobile app for your API)
-* Implement an API client library for the API designed above. Ideally, in a different language, of your preference, to the one used for the API
-* When a cell with no adjacent mines is revealed, all adjacent squares will be revealed (and repeat)
-* Ability to 'flag' a cell with a question mark or red flag
-* Detect when game is over
-* Persistence
-* Time tracking
-* Ability to start a new game and preserve/resume the old ones
-* Ability to select the game parameters: number of rows, columns, and mines
-* Ability to support multiple users/accounts
- 
-## Deliverables we expect:
-* URL where the game can be accessed and played (use any platform of your preference: heroku.com, aws.amazon.com, etc)
-* Code in a public Github repo
-* README file with the decisions taken and important notes
+### Register a User
+```http request
+POST /v1/users/register HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Content-Type: application/json
 
-## Time Spent
-You need to fully complete the challenge. We suggest not to spend more than 5 days total.  Please make commits as often as possible so we can see the time you spent and please do not make one commit.  We will evaluate the code and time spent.
- 
-What we want to see is how well you handle yourself given the time you spend on the problem, how you think, and how you prioritize when time is sufficient to solve everything.
+{ 
+    "email": "jesusdiazbc@gmail.com",
+    "password": "demo"
+}
+```
 
-Please email your solution as soon as you have completed the challenge or the time is up.
+### Authenticate User
+```http request
+POST /v1/users/auth HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Content-Type: application/json
+
+{ 
+    "email": "jesusdiazbc@gmail.com",
+    "password": "demo"
+}
+```
+
+## Game
+
+### Create a Game
+```http request
+POST /v1/games HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+    "number_of_rows": 15,
+    "number_of_cols": 15,
+    "number_of_mines": 20
+}
+```
+
+### Retrieve a Game
+```http request
+GET /v1/games/<game_id> HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Authorization: Bearer <access_token>
+
+```
+
+### List Games
+```http request
+GET /v1/games HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+    "number_of_rows": 2,
+    "number_of_cols": 4,
+    "number_of_mines": 30
+}
+```
+
+### Hold a Game
+```http request
+POST /v1/games/<game_id>/hold HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Authorization: Bearer <access_token>
+
+
+```
+
+### Resume a Game
+```http request
+POST /v1/games/<game_id>/resume HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Authorization: Bearer <access_token>
+
+
+```
+
+### Uncover a Cell
+```http request
+POST /v1/games/<game_id>/uncover/<cell_id> HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Authorization: Bearer <access_token>
+
+
+```
+
+### Flag a Cell
+```http request
+POST /v1/games/<game_id>/flag/<cell_id> HTTP/1.1
+Host: https://minesweeper-jd.herokuapp.com
+Authorization: Bearer <access_token>
+
+
+```
+
+# Client Library (Python)
+I created a python library to make requests to the API. For more information please go to this repository: https://github.com/jedi4z/minesweeper-api-lib
+
+# TODO
+- Add a configuration module using https://github.com/spf13/viper
+- Testing (unit tests and functional tests).
+- Document the API using swagger.
+- Configure CI/CD with any tool like CircleCI, Jenkins or Github Actions.  
