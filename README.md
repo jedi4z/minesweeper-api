@@ -10,6 +10,23 @@ This is API rest written in GO that allows you to play the classic game [Mineswe
 - **app/usecases:** This is an important layer and the entry point of business logic. Each business feature is implemented by a use case. It is the top level layer, so no other layer depends on it ( except “cmd”), but it depends on other layers.
 - **cmd:** the command. All different types of “main.go” are here and you can have multiple ones. This is the starting point of the application.
 
+# How to run the project
+```
+# Start the service
+make run
+
+# Build and start service using docker-compose
+make up
+
+# Delete docker containers
+make down
+```
+As an alternative you can use docker-compose command
+
+```
+docker-compose up
+docker-compose down
+```
 
 # API
 Here are the endpoints that need to be used to play the game, also there are a Postman collection and environment to test the API.
